@@ -25,6 +25,11 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Analysis",
 ]
 
+[project.urls]
+Homepage = "https://github.com/hubee73/hirescheck"
+Issues = "https://github.com/hubee73/hirescheck/issues"
+Changelog = "https://github.com/hubee73/hirescheck/blob/main/CHANGELOG.md"
+
 [project.optional-dependencies]
 plot = ["matplotlib>=3.7"]
 

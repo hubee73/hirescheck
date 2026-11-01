@@ -18,19 +18,21 @@
 - Python 3.10 或更新版本；
 - FFmpeg（`ffmpeg` 与 `ffprobe`）：macOS 用 `brew install ffmpeg`，Debian/Ubuntu 用 `sudo apt install ffmpeg`，Windows 用 `winget install Gyan.FFmpeg`。检查 DSD 需要 FFmpeg 支持 DSD 解码，常见的发行版都支持。
 
-用 pip 安装，在项目目录里运行。推荐用 [pipx](https://pipx.pypa.io/)，它会自动建一个独立的虚拟环境，并把 `hirescheck` 命令放进 PATH：
+推荐用 [pipx](https://pipx.pypa.io/) 安装，它会自动建一个独立的虚拟环境，并把 `hirescheck` 命令放进 PATH：
 
 ```bash
-pipx install ".[plot]"      # 不要频谱图就去掉 [plot]，不装 matplotlib
-pipx upgrade hirescheck     # 更新代码后升级（或 pipx install --force ".[plot]"）
-pipx uninstall hirescheck   # 卸载；报告和自己学习的加工链指纹不会被删除
+pipx install "hirescheck[plot]"     # 从 PyPI 安装；不要频谱图就去掉 [plot]，不装 matplotlib
+pipx upgrade hirescheck             # 升级
+pipx uninstall hirescheck           # 卸载；报告和自己学习的加工链指纹不会被删除
 ```
+
+也可以直接从 GitHub 安装最新代码：`pipx install "hirescheck[plot] @ git+https://github.com/hubee73/hirescheck.git"`。或者先 `git clone`，再在项目目录里运行 `pipx install ".[plot]"`。
 
 不用 pipx 时，自己建一个虚拟环境：
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install ".[plot]"
+.venv/bin/pip install "hirescheck[plot]"
 .venv/bin/hirescheck "歌曲.flac"
 ```
 
@@ -39,7 +41,7 @@ Windows：
 ```powershell
 winget install Gyan.FFmpeg     # 装好后重新打开终端
 py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install ".[plot]"
+.\.venv\Scripts\python.exe -m pip install "hirescheck[plot]"
 .\.venv\Scripts\hirescheck.exe "D:\音乐\歌曲.flac"
 ```
 
@@ -305,6 +307,26 @@ python tests/check_chains.py --chain chain-192k-a --match 已知是这条链.txt
 `--match` 里的文件必须和指定的指纹吻合，`--no-match` 里的文件不能和任何指纹吻合。2L 的免费测试曲目（原生 192k/352.8k 录音）适合放进 `--no-match`。这些音频受版权保护，不要提交到仓库里。
 
 代码检查用 ruff：`ruff check hirescheck tests`。GitHub Actions 会在 Linux 和 macOS、Python 3.10 和 3.13 上跑 ruff、合成样本和回归测试。
+
+## 开发与发布
+
+```bash
+git clone https://github.com/hubee73/hirescheck.git && cd hirescheck
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e ".[plot]" ruff build twine   # -e：改了代码立即生效，不用重装
+hirescheck --version                         # 或 python -m hirescheck
+ruff check hirescheck tests                  # 代码检查
+python tests/make_corpus.py /tmp/corpus && python tests/run_tests.py /tmp/corpus   # 回归测试
+python -m build && twine check dist/*        # 打包：dist/ 里生成 .whl 和 .tar.gz
+pip install dist/hirescheck-*.whl            # 在别的虚拟环境里试装打出来的包
+```
+
+发布新版本：
+1. 改 `hirescheck/__init__.py` 里的 `VERSION`，在 `CHANGELOG.md` 里写上这一版的改动；
+2. 提交并推送，等 CI 通过；
+3. 打标签并推送：`git tag v1.5.1 && git push origin v1.5.1`。
+
+推送标签后，GitHub Actions 的 Release 流程会检查标签和 `VERSION` 是否一致、打包、创建 GitHub Release（附上 .whl 和 .tar.gz），并发布到 PyPI。发布到 PyPI 用的是 trusted publishing，不需要在仓库里存密码，但第一次发布前要在 pypi.org 上配置一次，见 `.github/workflows/release.yml` 开头的说明。
 
 ## 许可证
 

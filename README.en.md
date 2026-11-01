@@ -1,6 +1,6 @@
 # hirescheck — where did this hi-res PCM / DSD file really come from?
 
-[中文](README.md) | **English**
+[中文](https://github.com/hubee73/hirescheck/blob/main/README.md) | **English**
 
 For PCM files, hirescheck answers: **was a high-rate file (96k/192k, …) upsampled from a lower rate, roughly from which rate, does it hold anything a 48 kHz file cannot, and how much energy does a trip through 48 kHz remove?** It cannot prove from one file that 192 kHz sounds better, nor certify where a recording came from.
 
@@ -20,19 +20,21 @@ You need:
 - Python 3.10 or newer;
 - FFmpeg (`ffmpeg` and `ffprobe`): `brew install ffmpeg` on macOS, `sudo apt install ffmpeg` on Debian/Ubuntu, `winget install Gyan.FFmpeg` on Windows. Checking DSD needs an FFmpeg with DSD decoding, which common builds have.
 
-Install with pip from the project folder. [pipx](https://pipx.pypa.io/) is recommended: it creates an isolated virtualenv and puts the `hirescheck` command on your PATH:
+[pipx](https://pipx.pypa.io/) is recommended: it creates an isolated virtualenv and puts the `hirescheck` command on your PATH:
 
 ```bash
-pipx install ".[plot]"      # drop [plot] to skip matplotlib and the spectrum plot
-pipx upgrade hirescheck     # upgrade after updating the code (or pipx install --force ".[plot]")
-pipx uninstall hirescheck   # uninstall; reports and learned chain fingerprints are kept
+pipx install "hirescheck[plot]"     # from PyPI; drop [plot] to skip matplotlib and the spectrum plot
+pipx upgrade hirescheck             # upgrade
+pipx uninstall hirescheck           # uninstall; reports and learned chain fingerprints are kept
 ```
+
+The latest code installs straight from GitHub: `pipx install "hirescheck[plot] @ git+https://github.com/hubee73/hirescheck.git"`, or `git clone` and run `pipx install ".[plot]"` in the project folder.
 
 Without pipx, use a virtualenv of your own:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install ".[plot]"
+.venv/bin/pip install "hirescheck[plot]"
 .venv/bin/hirescheck "song.flac"
 ```
 
@@ -41,7 +43,7 @@ Windows:
 ```powershell
 winget install Gyan.FFmpeg     # then reopen the terminal
 py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install ".[plot]"
+.\.venv\Scripts\python.exe -m pip install "hirescheck[plot]"
 .\.venv\Scripts\hirescheck.exe "D:\Music\song.flac"
 ```
 
@@ -310,6 +312,26 @@ Files under `--match` must match the named chain; files under `--no-match` must 
 
 Lint with ruff: `ruff check hirescheck tests`. GitHub Actions runs ruff, the synthetic corpus and the regression tests on Linux and macOS with Python 3.10 and 3.13.
 
+## Development and releases
+
+```bash
+git clone https://github.com/hubee73/hirescheck.git && cd hirescheck
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e ".[plot]" ruff build twine   # -e: code changes take effect without reinstalling
+hirescheck --version                         # or python -m hirescheck
+ruff check hirescheck tests                  # lint
+python tests/make_corpus.py /tmp/corpus && python tests/run_tests.py /tmp/corpus   # regression tests
+python -m build && twine check dist/*        # build: a .whl and a .tar.gz in dist/
+pip install dist/hirescheck-*.whl            # try the built package in another virtualenv
+```
+
+To release a new version:
+1. bump `VERSION` in `hirescheck/__init__.py` and describe the changes in `CHANGELOG.md`;
+2. commit, push, and wait for CI to pass;
+3. tag and push the tag: `git tag v1.5.1 && git push origin v1.5.1`.
+
+The Release workflow then checks the tag against `VERSION`, builds, creates a GitHub Release with the .whl and .tar.gz attached, and publishes to PyPI. PyPI uses trusted publishing, so no password is stored in the repository, but it has to be set up once on pypi.org before the first release; see the top of `.github/workflows/release.yml`.
+
 ## License
 
-[MIT](LICENSE).
+[MIT](https://github.com/hubee73/hirescheck/blob/main/LICENSE).

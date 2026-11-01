@@ -1,6 +1,6 @@
 # Changelog / 更新记录
 
-## 1.5.0 — unreleased / 未发布
+## 1.5.0 — 2026-11-01
 
 - Output in Chinese or English: follows the system language, `--lang zh|en` overrides it (including `--help`).
   输出支持中文和英文：默认跟随系统语言，可用 `--lang zh|en` 指定（`--help` 也会切换）。
