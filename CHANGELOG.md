@@ -6,8 +6,8 @@
   输出支持中文和英文：默认跟随系统语言，可用 `--lang zh|en` 指定（`--help` 也会切换）。
 - `report.json`: new `language` field; likelihood grades are stored as codes (`very_high` … `unknown`) with a separate `level_text`.
   `report.json` 新增 `language` 字段；可能性等级改存为代码（`very_high` … `unknown`），文字另存在 `level_text`。
-- Packaged as a Python package (`pip install .`, `pipx install .`, `python -m hirescheck`); `install.sh` now pip-installs it into its virtualenv.
-  改为标准 Python 包（`pip install .`、`pipx install .`、`python -m hirescheck`）；`install.sh` 改为把它安装进自己的虚拟环境。
+- Packaged as a Python package (`pip install .`, `pipx install .`, `python -m hirescheck`); `install.sh` is removed — install with pip/pipx.
+  改为标准 Python 包（`pip install .`、`pipx install .`、`python -m hirescheck`）；删除 `install.sh`，统一用 pip/pipx 安装。
 - Neutral wording for processing-chain matches; the built-in chain is named `chain-192k-a`.
   加工链吻合时的措辞改为中性；内置指纹命名为 `chain-192k-a`。
 - MIT license, English README, CI (ruff + synthetic regression tests on Linux/macOS, Python 3.10/3.13).

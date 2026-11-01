@@ -16,31 +16,25 @@
 
 需要：
 - Python 3.10 或更新版本；
-- FFmpeg（`ffmpeg` 与 `ffprobe`）：macOS 用 `brew install ffmpeg`，Debian/Ubuntu 用 `sudo apt install ffmpeg`，Windows 用 `winget install Gyan.FFmpeg`。
+- FFmpeg（`ffmpeg` 与 `ffprobe`）：macOS 用 `brew install ffmpeg`，Debian/Ubuntu 用 `sudo apt install ffmpeg`，Windows 用 `winget install Gyan.FFmpeg`。检查 DSD 需要 FFmpeg 支持 DSD 解码，常见的发行版都支持。
 
-**用 pipx 安装**（推荐，任何系统都可以；在项目目录里运行）：
-
-```bash
-pipx install ".[plot]"      # 不要频谱图就去掉 [plot]
-```
-
-**用安装脚本**（macOS / Linux，在项目目录里运行）：
+用 pip 安装，在项目目录里运行。推荐用 [pipx](https://pipx.pypa.io/)，它会自动建一个独立的虚拟环境，并把 `hirescheck` 命令放进 PATH：
 
 ```bash
-./install.sh            # 完整安装
-./install.sh --no-plot  # 不装 matplotlib，不生成频谱图
+pipx install ".[plot]"      # 不要频谱图就去掉 [plot]，不装 matplotlib
+pipx upgrade hirescheck     # 更新代码后升级（或 pipx install --force ".[plot]"）
+pipx uninstall hirescheck   # 卸载；报告和自己学习的加工链指纹不会被删除
 ```
 
-安装脚本会：
-1. 检查 Python、venv、ffmpeg/ffprobe，以及 FFmpeg 是否支持 FLAC 和 DSD 解码。缺什么就提示对应系统的安装命令；FFmpeg 不支持 DSD 时只给警告，PCM 检查不受影响。
-2. 在 `~/.local/share/hirescheck/.venv` 建虚拟环境（设置了 `XDG_DATA_HOME` 时放在 `$XDG_DATA_HOME/hirescheck/`），把 hirescheck 连同 numpy、scipy、matplotlib 装进去。
-3. 生成启动器 `~/.local/bin/hirescheck`。如果 `~/.local/bin` 不在 PATH 中，会提示要加到哪个配置文件。
+不用 pipx 时，自己建一个虚拟环境：
 
-更新代码后重新运行 `./install.sh` 即可：程序会被重新安装，能用的虚拟环境会保留。想换 Python 版本，用 `PYTHON=python3.12 ./install.sh` 指定解释器，这时会用它重建虚拟环境。卸载用 `./install.sh --uninstall`，只删除上述两处，不会删除报告。
+```bash
+python3 -m venv .venv
+.venv/bin/pip install ".[plot]"
+.venv/bin/hirescheck "歌曲.flac"
+```
 
-安装脚本不会覆盖已有的、不是它生成的 `~/.local/bin/hirescheck`。
-
-**Windows** 没有安装脚本，用 pipx，或者手动建虚拟环境：
+Windows：
 
 ```powershell
 winget install Gyan.FFmpeg     # 装好后重新打开终端
@@ -48,6 +42,8 @@ py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install ".[plot]"
 .\.venv\Scripts\hirescheck.exe "D:\音乐\歌曲.flac"
 ```
+
+用过 1.5.0 之前的 `install.sh` 的，可以手动删掉旧的安装：`rm -rf ~/.local/share/hirescheck ~/.local/bin/hirescheck`。
 
 ## 使用
 

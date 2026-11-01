@@ -18,29 +18,25 @@ Program output is available in Chinese and English (see "Output language").
 
 You need:
 - Python 3.10 or newer;
-- FFmpeg (`ffmpeg` and `ffprobe`): `brew install ffmpeg` on macOS, `sudo apt install ffmpeg` on Debian/Ubuntu, `winget install Gyan.FFmpeg` on Windows.
+- FFmpeg (`ffmpeg` and `ffprobe`): `brew install ffmpeg` on macOS, `sudo apt install ffmpeg` on Debian/Ubuntu, `winget install Gyan.FFmpeg` on Windows. Checking DSD needs an FFmpeg with DSD decoding, which common builds have.
 
-**With pipx** (recommended, any system; run in the project folder):
-
-```bash
-pipx install ".[plot]"      # drop [plot] if you do not want spectrum plots
-```
-
-**With the install script** (macOS / Linux, run in the project folder):
+Install with pip from the project folder. [pipx](https://pipx.pypa.io/) is recommended: it creates an isolated virtualenv and puts the `hirescheck` command on your PATH:
 
 ```bash
-./install.sh            # full install
-./install.sh --no-plot  # without matplotlib (no spectrum plot)
+pipx install ".[plot]"      # drop [plot] to skip matplotlib and the spectrum plot
+pipx upgrade hirescheck     # upgrade after updating the code (or pipx install --force ".[plot]")
+pipx uninstall hirescheck   # uninstall; reports and learned chain fingerprints are kept
 ```
 
-The script:
-1. Checks Python, venv, ffmpeg/ffprobe, and whether FFmpeg can decode FLAC and DSD. Anything missing is reported with the install command for your system; FFmpeg without DSD support only gives a warning, since PCM checks still work.
-2. Creates a virtualenv in `~/.local/share/hirescheck/.venv` (`$XDG_DATA_HOME/hirescheck/` if set) and installs hirescheck with numpy, scipy and matplotlib into it.
-3. Writes the launcher `~/.local/bin/hirescheck`, and tells you which shell file to edit if `~/.local/bin` is not on your PATH.
+Without pipx, use a virtualenv of your own:
 
-Run `./install.sh` again after updating the code: the program is reinstalled and a working virtualenv is reused. `PYTHON=python3.12 ./install.sh` rebuilds the virtualenv with that interpreter. `./install.sh --uninstall` removes only those two places; reports and learned chain fingerprints are kept. The script never overwrites a `~/.local/bin/hirescheck` it did not create. (The install script's own messages are in Chinese.)
+```bash
+python3 -m venv .venv
+.venv/bin/pip install ".[plot]"
+.venv/bin/hirescheck "song.flac"
+```
 
-**Windows** has no install script; use pipx, or a virtualenv:
+Windows:
 
 ```powershell
 winget install Gyan.FFmpeg     # then reopen the terminal
@@ -48,6 +44,8 @@ py -m venv .venv
 .\.venv\Scripts\python.exe -m pip install ".[plot]"
 .\.venv\Scripts\hirescheck.exe "D:\Music\song.flac"
 ```
+
+If you used the `install.sh` of versions before 1.5.0, remove the old install by hand: `rm -rf ~/.local/share/hirescheck ~/.local/bin/hirescheck`.
 
 ## Usage
 
