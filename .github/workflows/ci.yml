@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install ruff
+      - run: ruff check hirescheck tests
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install FFmpeg
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then sudo apt-get update && sudo apt-get install -y ffmpeg
+          else brew install ffmpeg; fi
+      - name: Install hirescheck
+        run: pip install ".[plot]"
+      - name: Smoke test
+        run: |
+          hirescheck --version
+          hirescheck --lang en --list-chains
+          hirescheck --lang zh --help > /dev/null
+      - name: Synthetic corpus
+        run: python tests/make_corpus.py "$RUNNER_TEMP/corpus"
+      - name: Regression tests
+        run: python tests/run_tests.py "$RUNNER_TEMP/corpus"

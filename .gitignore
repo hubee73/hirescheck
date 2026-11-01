@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+result/
+*_hirescheck/
+.DS_Store
+build/
+dist/
+*.egg-info/

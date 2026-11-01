@@ -1,0 +1,2 @@
+include CHANGELOG.md install.sh
+recursive-include tests *.py *.c

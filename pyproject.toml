@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hirescheck"
+dynamic = ["version"]
+description = "Check whether hi-res PCM was upsampled, CD-rate audio came from a lossy file, or DSD was made from PCM"
+readme = "README.en.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "hubee" }]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "scipy>=1.10"]
+keywords = ["audio", "hi-res", "upsampling", "flac", "dsd", "lossless", "spectrum"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Natural Language :: Chinese (Simplified)",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.7"]
+
+[project.scripts]
+hirescheck = "hirescheck:main"
+
+[tool.setuptools]
+packages = ["hirescheck"]
+
+[tool.setuptools.package-data]
+hirescheck = ["chains/*.json"]
+
+[tool.setuptools.dynamic]
+version = { attr = "hirescheck.VERSION" }
+
+[tool.ruff]
+line-length = 130
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP"]
+ignore = ["E501", "UP007", "B905"]
